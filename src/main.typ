@@ -31,3 +31,4 @@
 #include "chapters/01_iot.typ"
 #include "chapters/02_mqtt.typ"
 #include "chapters/03_zigbee.typ"
+#include "chapters/04_iot_design.typ"
