@@ -33,3 +33,4 @@
 #include "chapters/03_zigbee.typ"
 #include "chapters/04_iot_design.typ"
 #include "chapters/05_mac.typ"
+#include "chapters/06_ieee.typ"
