@@ -29,3 +29,4 @@
 #part("Part 1")
 
 #include "chapters/01_iot.typ"
+#include "chapters/02_mqtt.typ"
