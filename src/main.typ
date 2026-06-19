@@ -25,3 +25,7 @@
 #show: main-matter
 
 #tableofcontents
+
+#part("Part 1")
+
+#include "chapters/01_iot.typ"
