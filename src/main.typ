@@ -29,9 +29,10 @@
 #part("Part 1")
 
 #include "chapters/01_iot.typ"
-#include "chapters/02_mqtt.typ"
-#include "chapters/03_zigbee.typ"
-#include "chapters/04_iot_design.typ"
+#include "chapters/02_iot_design.typ"
+#include "chapters/03_harvesting.typ"
+#include "chapters/04_ieee.typ"
 #include "chapters/05_mac.typ"
-#include "chapters/06_ieee.typ"
-#include "chapters/07_arduino.typ"
+#include "chapters/06_zigbee.typ"
+#include "chapters/07_mqtt.typ"
+#include "chapters/08_arduino.typ"
