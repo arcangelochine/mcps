@@ -49,8 +49,8 @@
   ZigBee is not a monolithic standard but a layered architecture built upon IEEE
   802.15.4. The 802.15.4 specification, first published in 2003 and revised in
   2006, defines the physical and MAC layers for low-rate wireless personal area
-  networks (PANs). It operates in three licence-free bands: 868–868.6 MHz
-  (Europe, 20 kbps), 902–928 MHz (North America, 40 kbps), and 2400–2483.5 MHz
+  networks (PANs). It operates in three licence-free bands: 868-868.6 MHz
+  (Europe, 20 kbps), 902-928 MHz (North America, 40 kbps), and 2400-2483.5 MHz
   (worldwide, 250 kbps). It specifies star and peer-to-peer topologies and is
   designed to coexist with IEEE 802.11 (Wi-Fi) and IEEE 802.15.1 (Bluetooth) in
   the 2.4 GHz band. ZigBee's first specification appeared at the end of 2004,

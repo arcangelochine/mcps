@@ -121,7 +121,7 @@
   For a sensor-class radio (as found in a mote-class IoT node), the figures are
   lower in absolute terms but structurally similar: sleep mode consumes
   approximately 0.016 mW, while listen, receive, and transmit modes each consume
-  roughly 12–18 mW. Two observations follow. First, the energy cost of listening
+  roughly 12-18 mW. Two observations follow. First, the energy cost of listening
   for transmissions that may never arrive is almost as large as the cost of
   actively receiving a packet---because in both cases the RF front-end, the
   analog-to-digital converter, and the demodulation circuitry are all powered

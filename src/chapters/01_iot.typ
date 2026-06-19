@@ -322,7 +322,7 @@
   communication stack has been standardized at multiple layers, though not
   uniformly. At the physical and MAC layers, _IEEE 802.11_ (Wi-Fi) provides
   high-throughput, medium-range wireless LAN connectivity; its evolution from
-  802.11 (1–2 Mbps at 2.4 GHz) through 802.11a/b/g/n/ac has continuously
+  802.11 (1-2 Mbps at 2.4 GHz) through 802.11a/b/g/n/ac has continuously
   expanded throughput and range while adding features such as QoS, directional
   antennas, and roaming. _IEEE 802.15.4_ targets the low-power, low-throughput
   regime appropriate for sensor networks, supporting up to 115 kbps with a duty
