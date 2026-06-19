@@ -27,7 +27,7 @@
 ]
 
 #chapter(
-  title: "MAC Protocols for Energy-Efficient IoT Networks",
+  title: "Energy-Aware MAC Protocols",
   abstract: abs,
   toc: true,
 )[
@@ -40,7 +40,8 @@
   protocol design is clear: a radio that is powered on but idle---listening for
   transmissions that may never arrive---dissipates energy at a rate approaching
   its peak, with no productive output. Any MAC protocol that aspires to extend
-  device lifetime must therefore minimize idle listening, not merely collisions.
+  device lifetime must therefore minimize _idle listening_, not merely
+  collisions.
 
   This requirement introduces a tension that does not arise in conventional
   wireless networking. In a standard Wi-Fi or cellular network, devices are
@@ -117,7 +118,7 @@
   Transmissions in S-MAC occur during the listen period of the intended
   receiver. Before transmitting, a node performs carrier sensing; if the channel
   is busy, the transmission is deferred to the next listen period. Collision
-  avoidance employs the RTS/CTS (Request to Send / Clear to Send) mechanism
+  avoidance employs the _RTS/CTS_ (Request to Send / Clear to Send) mechanism
   familiar from IEEE 802.11: the sender first issues an RTS, the receiver
   responds with a CTS if it is free, and only then does the data frame follow.
   This sequence prevents the hidden terminal problem---the situation where two
@@ -160,7 +161,7 @@
   over time. Quartz oscillators in microcontrollers drift by tens to hundreds of
   parts per million, which at low duty cycles can accumulate to meaningful
   fractions of a listen period within minutes or hours. S-MAC addresses this by
-  including drift correction in its SYNC protocol: nodes continuously update
+  including drift correction in its _SYNC protocol_: nodes continuously update
   their schedule estimates based on received SYNC frames, and may decide to
   shift to a different schedule if a significant majority of their neighbors
   have converged to one. In dense networks, synchronization maintenance is a
@@ -241,7 +242,7 @@
   transmission duty cycle (since the receiver only encounters the preamble at a
   random point within its duration):
 
-  $ "DC"_"rec" = f_"data" dot frac(1, 2) (t_"preamble" + t_"data") $
+  $ "DC"_"rec" = f_"data" dot 1/2 (t_"preamble" + t_"data") $
 
   The energy consumed by the receiver per unit time is:
 
@@ -250,8 +251,8 @@
   $
 
   Given a battery with initial charge $B_"charge"$ (in joules), the lifetime of
-  the transmitter is $B_"charge" \/ E_T(1)$ and the lifetime of the receiver is
-  $B_"charge" \/ E_R(1)$.
+  the transmitter is $B_"charge" \/ (E_T (1))$ and the lifetime of the receiver
+  is $B_"charge" \/ (E_R (1))$.
 
   === Optimal Check Interval
 
