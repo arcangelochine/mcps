@@ -43,3 +43,4 @@
 #include "chapters/10_mobile.typ"
 #include "chapters/11_sdn.typ"
 #include "chapters/12_nfv.typ"
+#include "chapters/13_mec.typ"
