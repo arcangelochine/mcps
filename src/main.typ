@@ -36,3 +36,7 @@
 #include "chapters/06_zigbee.typ"
 #include "chapters/07_mqtt.typ"
 #include "chapters/08_arduino.typ"
+
+#part("Part 2")
+
+#include "chapters/09_wireless.typ"
