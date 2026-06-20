@@ -30,7 +30,7 @@
   toc: true,
 )[
 
-  == Motivations: Beyond the Finite Battery
+  == Motivations and Architecture
 
   The preceding chapters established that duty cycling is the principal
   mechanism by which battery-powered IoT devices extend their operational
@@ -61,18 +61,19 @@
   harvested energy is typically variable, intermittent, and outside the
   designer's direct control.
 
-  == Harvesting Architectures
-
   === Harvest-Use
 
   The simplest harvesting architecture connects the energy harvester directly to
-  the device load, with no energy storage. The device operates whenever the
-  instantaneous harvested power $P_s (t)$ meets or exceeds the instantaneous
-  load $P_c (t)$; it shuts off whenever the harvested power falls below the
-  minimum operating threshold. Examples of this architecture include passive
-  RFID tags, which derive all their power from the electromagnetic field emitted
-  by a reader, and some piezo-electric systems that generate power only during
-  mechanical deformation.
+  the device load, with no energy storage. Suppose the harvester power output is
+  $P_s (t)$ at time $t$, and the energy being consumed at that time is
+  $P_c (t)$. The device operates whenever the instantaneous harvested power
+  meets or exceeds the instantaneous load $P_s (t) >= P_c (t)$; it shuts off
+  whenever the harvested power falls below the minimum operating threshold.
+  Examples of this architecture include passive RFID tags, which derive all
+  their power from the electromagnetic field emitted by a reader, and some
+  piezo-electric systems that generate power only during mechanical deformation.
+  Another rudimental example is a water-powered flour mill, the flour is milled
+  if and only if sufficient water is flowing.
 
   The energy dynamics of harvest-use systems are straightforward: there is no
   buffer to store surplus energy, so any excess production
@@ -102,10 +103,10 @@
   with infinite capacity, no leakage, and a charging efficiency of
   $eta = 1$---the device can operate for any time interval $[0, T]$ as long as
   the cumulative energy consumed does not exceed the cumulative energy harvested
-  plus the initial buffer charge:
+  plus the initial buffer charge $B_0$:
 
   $
-    integral_0^T P_c (t) d t <= integral_0^T P_s (t) d t + B_0 quad forall T in (0, infinity)
+    integral_T P_c (t) d t <= integral_T P_s (t) d t + B_0 quad forall T in (0, infinity)
   $
 
   Real buffers, however, are characterized by three imperfections that must be
@@ -121,10 +122,10 @@
   $B_0$ and current charge $B_T$ at time $T$ is:
 
   $
-    B_T = B_0 + eta integral_0^T (P_s (t) - P_c (t))^+ d t - integral_0^T (P_c (t) - P_s (t))^+ d t - integral_0^T P_"leak" (t) d t >= 0
+    B_T = B_0 + eta integral_T [P_s (t) - P_c (t)]^+ d t - integral_T [P_c (t) - P_s (t)]^+ d t - integral_T P_"leak" (t) d t >= 0
   $
 
-  where the notation $(x)^+ = max(x, 0)$ is the rectifier function that extracts
+  where the notation $[x]^+ = max(x, 0)$ is the rectifier function that extracts
   only the positive part of its argument. The first integral represents energy
   harvested in excess of load and stored in the buffer (reduced by charging
   efficiency); the second represents energy drawn from the buffer when harvested
@@ -132,9 +133,10 @@
   can operate as long as $B_T >= 0$ for all $T$. The buffer capacity constraint
   adds the requirement that $B_T <= B_"max"$ for all $T$---any surplus that
   would exceed capacity is wasted---which is a sufficient but not necessary
-  condition for energy conservation.
+  condition for energy conservation. $B_T <= B_"max"$ becomes necessary if
+  wasting energy is not allowed.
 
-  == Energy Sources and Storage Technologies
+  == Energy Sources, Storage and Neutrality
 
   === Classification of Energy Sources
 
@@ -220,18 +222,37 @@
   step is approximately 0.7 mAh, providing finer resolution that benefits more
   granular scheduling algorithms.
 
-  The energy production of the harvester can be estimated indirectly from
-  consecutive battery charge measurements combined with knowledge of the load:
+  The energy production of the harvester (_environmental energy_) can be
+  estimated indirectly from consecutive battery charge measurements combined
+  with knowledge of the load:
 
-  $ E_e = integral_(t_1)^(t_2) (p_c (t))^+ d t + E_b (t_2) - E_b (t_1) $
+  $ E_e = [E_b (t_2) - E_b (t_1) + integral_(t_1)^(t_2) P_c (t) d t]^+ $
 
-  where $E_b (t)$ denotes the battery charge measured at time $t$ and $p_c (t)$
-  is the known power consumption. This indirect method accumulates errors from
-  both the ADC quantization and the uncertainty in $p_c (t)$; dedicated energy
-  metering hardware provides more accurate results at the cost of additional
-  circuit complexity.
+  where $E_b (t)$ denotes the battery charge measured at time $t$ and $P_c (t)$
+  is the load power consumption over the interval $[t_1, t_2]$. The rectifier
+  operator $[dot]^+$ ensures the estimate remains non-negative, since
+  measurement noise can otherwise yield physically meaningless negative
+  production values.
 
-  == Energy Neutrality
+  This indirect method has three practical limitations. First, it accumulates
+  errors from ADC quantization in the battery voltage measurement and from
+  uncertainty in $P_c (t)$, which is itself difficult to determine precisely: a
+  device typically comprises multiple subsystems whose instantaneous consumption
+  depends on the current application workload—radio activity alone can cause
+  power draw to vary by an order of magnitude. Second, the choice of the
+  sampling interval $t_2 - t_1$ introduces a fundamental trade-off: when the
+  interval is too short, the change in battery voltage lies within the ADC's
+  quantization noise floor, making the estimate unreliable; when the interval is
+  too long, the estimate loses temporal resolution and it becomes impossible to
+  determine when during the interval the energy was actually available. Third,
+  the method assumes that the load model $P_c(t)$ is known a priori, an
+  assumption that breaks down for applications with highly dynamic or
+  unpredictable workloads. Where measurement accuracy is critical, dedicated
+  energy metering hardware— such as a current-sense amplifier on the harvester
+  output—provides direct, high-resolution measurement at the cost of additional
+  circuit complexity and power consumption.
+
+  === Energy Neutrality
 
   The conventional objective in IoT energy management is to maximize device
   lifetime---to keep the device operational for as long as possible given a
@@ -260,7 +281,7 @@
   energy but uses it inefficiently may bottleneck network-wide performance just
   as much as a node with scarce harvesting.
 
-  == Kansal's Framework for Energy-Neutral Operation
+  == Kansal's Algorithm
 
   === Conditions for Energy Neutrality
 
@@ -269,31 +290,43 @@
   characterized by statistical properties of energy production, what conditions
   must the load satisfy to guarantee energy neutrality?
 
-  The framework models energy production $E_T = integral_0^T P_s (t) d t$ over
-  any interval $[0, T]$ as satisfying a linear bounding constraint: there exist
-  real numbers $rho_s$ (the long-run average production rate) and $sigma$ (a
-  burstiness parameter) such that:
+  The framework models energy production and consumption as constrained
+  functions. In particular, energy production $E_T = integral_T P_s (t) d t$
+  over any interval $[0, T]$ satisfies the following bounding constraint:
 
   $ rho_s dot T - sigma <= E_T <= rho_s dot T + sigma quad forall T $
 
-  Similarly, the energy load $L_T = integral_0^T P_c (t) d t$ is modeled as
-  satisfying:
+  where $rho_s$ is the long-run average production rate and $sigma$ is a
+  burstiness parameter. Similarly, the energy consumption
+  $L_T = integral_T P_c (t) d t$ over any interval $[0, T]$ satisfies the
+  following constraint:
 
   $ 0 <= L_T <= rho_c dot T + delta $
 
-  for long-run average consumption rate $rho_c$ and burst parameter $delta$.
+  where $rho_t$ is the long-run average consumption rate and $delta$ is a
+  burstiness parameter. On the other hand, the leakage from the energy buffer is
+  modeled as a constant:
+
+  $ P_"leak" (t) = rho_"leak" quad forall t $
 
   Under these assumptions, Kansal's theorem states that a sufficient condition
-  for energy neutrality is the simultaneous satisfaction of three inequalities.
+  for energy neutrality is the simultaneous satisfaction of three inequalities:
+
+  $
+    cases(
+      eta rho_s >= & rho_c + rho_"leak",
+      B_0 >= & eta sigma + delta,
+      B_0 <= B_"max"
+    )
+  $
+
   First, the effective production rate (after charging efficiency loss) must
-  exceed the sum of load rate and leakage rate:
-  $eta rho_s >= rho_c + rho_"leak"$. Second, the initial battery charge must be
-  sufficient to handle the worst-case mismatch between production and
-  consumption: $B_0 >= eta sigma + delta$. Third, the required initial charge
-  must be admissible: $B_0 <= B_"max"$. These conditions are sufficient but not
-  necessary: a system may achieve energy neutrality with a smaller battery if
-  the actual production and load profiles are better matched than the worst-case
-  bounds suggest.
+  exceed the sum of load rate and leakage rate. Second, the initial battery
+  charge must be sufficient to handle the worst-case mismatch between production
+  and consumption. Third, the required initial charge must be admissible. These
+  conditions are sufficient but not necessary: a system may achieve energy
+  neutrality with a smaller battery if the actual production and load profiles
+  are better matched than the worst-case bounds suggest.
 
   === Duty Cycle Adaptation and Utility
 
@@ -312,6 +345,16 @@
   $"dc"_"min"$ is too infrequent to track the person's movement; sampling above
   $"dc"_"max"$ exceeds the person's maximum movement speed and adds no
   information.
+
+  This leads to an optimization problem where: the production varies over time
+  (uncontrolled), but it is predictable (by assumption); the load varies over
+  time according to the duty cycle (controlled); the battery charge varies over
+  time accordingly. Since the energy source is predictable we have to find the
+  load so that the system is energy neutral and the overall utility is
+  maximized. This approach works well if the source is "well" predictable. This
+  happens, for example, with the Sun. Mind that it is impractical to adjust
+  dynamically the duty cycle too often---afterall there is a system to manage
+  below and the risk would be to manage data sampled at irregular intervals.
 
   Kansal's algorithm maximizes total utility over a day by assigning a duty
   cycle to each time slot, given weather-forecast-based estimates of energy
@@ -335,9 +378,9 @@
   Energy production estimates are generated by an _exponentially weighted moving
   average_ (EWMA) filter. The estimated production in slot $i$ for day $j+1$ is:
 
-  $ hat(p)_s^(j+1) (i) = alpha dot hat(p)_s^j (i) + (1 - alpha) dot p_s^j (i) $
+  $ hat(p)_s^(j+1) (i) = alpha dot hat(p)_s^j (i) + (1 - alpha) dot P_s^j (i) $
 
-  where $p_s^j (i)$ is the measured production in slot $i$ of day $j$ and
+  where $P_s^j (i)$ is the measured production in slot $i$ of day $j$ and
   $alpha < 1$ is a smoothing parameter. The EWMA filter assumes day-to-day
   production in the same slot is correlated (as is the case for solar energy),
   giving more weight to the most recent observation while retaining historical
@@ -346,7 +389,7 @@
   forecasts---triggering a re-optimization of the remaining slots in the current
   day.
 
-  == A Task-Based Model for Load Modulation
+  == Task-Based Load Modulation
 
   === From Duty Cycles to Tasks
 
@@ -370,11 +413,11 @@
   The battery charge at the end of slot $i$ evolves as:
 
   $
-    B(i+1) = min(B_"max", B(i) + eta dot (p_s (i) - p_c (i))^+ - (p_c (i) - p_s (i))^+)
+    B(i+1) = min(B_"max", B(i) + eta dot [P_s (i) - P_c (i)]^+ - [P_c (i) - P_s (i)]^+)
   $
 
-  where $p_c (i)$ is the power consumption of the task assigned to slot $i$ and
-  $p_s (i)$ is the estimated harvested power in that slot. The battery charge is
+  where $P_c (i)$ is the power consumption of the task assigned to slot $i$ and
+  $P_s (i)$ is the estimated harvested power in that slot. The battery charge is
   capped at $B_"max"$ (excess production is wasted once the buffer is full) and
   must remain above $B_"min"$ at all times (the minimum operating voltage). The
   energy neutrality constraint requires that the battery charge at the end of
@@ -402,11 +445,11 @@
   The dynamic programming recursion operates backward from the last slot. For
   the last slot $k$, the optimal utility is:
 
-  $ "opt"(k, b) = max { u_j : b + eta dot (p_s^+ (k) - p_c^- (k)) >= B(1) } $
+  $ "opt"(k, b) = max { u_j : b + eta dot (P_s^+ (k) - P_c^- (k)) >= B(1) } $
 
   where the maximization is over all tasks $j = 0, dots, n-1$ that leave the
-  battery in a state satisfying energy neutrality, and $p_s^+ (k)$ and
-  $p_c^- (k)$ denote the surplus production and deficit consumption for that
+  battery in a state satisfying energy neutrality, and $P_s^+ (k)$ and
+  $P_c^- (k)$ denote the surplus production and deficit consumption for that
   task assignment. For earlier slots:
 
   $
