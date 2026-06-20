@@ -40,3 +40,4 @@
 #part("Part 2")
 
 #include "chapters/09_wireless.typ"
+#include "chapters/10_mobile.typ"
