@@ -9,18 +9,19 @@
   electrical power, potentially enabling devices to operate indefinitely. This
   chapter examines the architectures and analytical frameworks that arise when
   IoT systems harvest energy from the environment. Beginning with the two
-  canonical harvesting architectures---harvest-use and harvest-store-use---and their
-  formal energy models, the discussion progresses through the properties of real
-  energy sources and storage technologies, the concept of _energy neutrality_ as
-  an operational objective distinct from lifetime maximization, and two
-  progressively richer models for achieving it: Kansal's duty-cycle adaptation
-  framework and a task-based generalization that models discrete implementation
-  alternatives with distinct energy costs and utility values. The chapter closes
-  with a dynamic programming scheduler that solves the resulting task assignment
-  problem optimally within practical complexity bounds. The recurring tension is
-  between _predictability and control_: energy harvesting sources are often
-  uncontrollable, and the designer must match a variable, uncertain energy
-  supply to a load that can be modulated but not reduced to zero.
+  canonical harvesting architectures---harvest-use and harvest-store-use---and
+  their formal energy models, the discussion progresses through the properties
+  of real energy sources and storage technologies, the concept of _energy
+  neutrality_ as an operational objective distinct from lifetime maximization,
+  and two progressively richer models for achieving it: Kansal's duty-cycle
+  adaptation framework and a task-based generalization that models discrete
+  implementation alternatives with distinct energy costs and utility values. The
+  chapter closes with a dynamic programming scheduler that solves the resulting
+  task assignment problem optimally within practical complexity bounds. The
+  recurring tension is between _predictability and control_: energy harvesting
+  sources are often uncontrollable, and the designer must match a variable,
+  uncertain energy supply to a load that can be modulated but not reduced to
+  zero.
 ]
 
 #chapter(
@@ -66,45 +67,45 @@
 
   The simplest harvesting architecture connects the energy harvester directly to
   the device load, with no energy storage. The device operates whenever the
-  instantaneous harvested power $P_s(t)$ meets or exceeds the instantaneous load
-  $P_c(t)$; it shuts off whenever the harvested power falls below the minimum
-  operating threshold. Examples of this architecture include passive RFID tags,
-  which derive all their power from the electromagnetic field emitted by a
-  reader, and some piezo-electric systems that generate power only during
+  instantaneous harvested power $P_s (t)$ meets or exceeds the instantaneous
+  load $P_c (t)$; it shuts off whenever the harvested power falls below the
+  minimum operating threshold. Examples of this architecture include passive
+  RFID tags, which derive all their power from the electromagnetic field emitted
+  by a reader, and some piezo-electric systems that generate power only during
   mechanical deformation.
 
   The energy dynamics of harvest-use systems are straightforward: there is no
-  buffer to store surplus energy, so any excess production $P_s(t) - P_c(t) > 0$
-  is wasted. Conversely, any deficit $P_s(t) < P_c(t)$ causes the device to
-  switch off. The device's operational availability is therefore entirely
-  determined by the temporal coincidence of harvested power and load---a
-  coincidence that is not guaranteed in environments where the harvesting source
-  is intermittent or fluctuating. Abrupt variations in source power can cause
-  the device to oscillate rapidly between on and off states, which is
-  particularly harmful for systems that require initialization time after each
-  power-on.
+  buffer to store surplus energy, so any excess production
+  $P_s (t) - P_c (t) > 0$ is wasted. Conversely, any deficit $P_s (t) < P_c (t)$
+  causes the device to switch off. The device's operational availability is
+  therefore entirely determined by the temporal coincidence of harvested power
+  and load---a coincidence that is not guaranteed in environments where the
+  harvesting source is intermittent or fluctuating. Abrupt variations in source
+  power can cause the device to oscillate rapidly between on and off states,
+  which is particularly harmful for systems that require initialization time
+  after each power-on.
 
   === Harvest-Store-Use
 
-  The practical remedy for the limitations of harvest-use is an energy buffer---a
-  rechargeable battery or supercapacitor---interposed between harvester and load.
-  In the _harvest-store-use_ architecture, harvested energy is used immediately
-  to power the device when available, and any surplus charges the buffer. When
-  harvested power is insufficient, the buffer discharges to make up the deficit.
-  A DC-to-DC converter regulates the voltage presented to the load, decoupling
-  the load from the voltage variations of both the harvester output and the
-  buffer charge state.
+  The practical remedy for the limitations of harvest-use is an energy
+  buffer---a rechargeable battery or supercapacitor---interposed between
+  harvester and load. In the _harvest-store-use_ architecture, harvested energy
+  is used immediately to power the device when available, and any surplus
+  charges the buffer. When harvested power is insufficient, the buffer
+  discharges to make up the deficit. A DC-to-DC converter regulates the voltage
+  presented to the load, decoupling the load from the voltage variations of both
+  the harvester output and the buffer charge state.
 
   This architecture eliminates the direct coupling between instantaneous
   harvested power and device operation, allowing the device to operate
   continuously as long as the buffer retains charge. With an ideal buffer---one
-  with infinite capacity, no leakage, and a charging efficiency of $eta = 1$---the
-  device can operate for any time interval $[0, T]$ as long as the cumulative
-  energy consumed does not exceed the cumulative energy harvested plus the
-  initial buffer charge:
+  with infinite capacity, no leakage, and a charging efficiency of
+  $eta = 1$---the device can operate for any time interval $[0, T]$ as long as
+  the cumulative energy consumed does not exceed the cumulative energy harvested
+  plus the initial buffer charge:
 
   $
-    integral_0^T P_c(t) d t <= integral_0^T P_s(t) d t + B_0 quad forall T in (0, infinity)
+    integral_0^T P_c (t) d t <= integral_0^T P_s (t) d t + B_0 quad forall T in (0, infinity)
   $
 
   Real buffers, however, are characterized by three imperfections that must be
@@ -114,13 +115,13 @@
   a fraction of the energy delivered to the buffer is actually stored; the
   remainder is dissipated as heat. Third, they exhibit _self-discharge_ or
   leakage: stored energy decreases over time even when the device draws no
-  current, at a leakage power $P_"leak"(t)$.
+  current, at a leakage power $P_"leak" (t)$.
 
   The energy conservation equation for a non-ideal buffer with initial charge
   $B_0$ and current charge $B_T$ at time $T$ is:
 
   $
-    B_T = B_0 + eta integral_0^T (P_s(t) - P_c(t))^+ d t - integral_0^T (P_c(t) - P_s(t))^+ d t - integral_0^T P_"leak"(t) d t >= 0
+    B_T = B_0 + eta integral_0^T (P_s (t) - P_c (t))^+ d t - integral_0^T (P_c (t) - P_s (t))^+ d t - integral_0^T P_"leak" (t) d t >= 0
   $
 
   where the notation $(x)^+ = max(x, 0)$ is the rectifier function that extracts
@@ -129,9 +130,9 @@
   efficiency); the second represents energy drawn from the buffer when harvested
   power is insufficient; the third represents buffer leakage losses. The device
   can operate as long as $B_T >= 0$ for all $T$. The buffer capacity constraint
-  adds the requirement that $B_T <= B_"max"$ for all $T$---any surplus that would
-  exceed capacity is wasted---which is a sufficient but not necessary condition
-  for energy conservation.
+  adds the requirement that $B_T <= B_"max"$ for all $T$---any surplus that
+  would exceed capacity is wasted---which is a sufficient but not necessary
+  condition for energy conservation.
 
   == Energy Sources and Storage Technologies
 
@@ -206,7 +207,7 @@
   $x_"max"$ corresponding to these voltages are:
 
   $ x_"max" = 2^d - 1 $
-  $ x_"min" = "ROUND"(v_"min" / v_"max" dot (2^d - 1)) $
+  $ x_"min" = ceil(v_"min" / v_"max" dot (2^d - 1)) $
 
   For a measured ADC output $x$, the estimated battery charge is:
 
@@ -222,32 +223,32 @@
   The energy production of the harvester can be estimated indirectly from
   consecutive battery charge measurements combined with knowledge of the load:
 
-  $ E_e = integral_(t_1)^(t_2) (p_c(t))^+ d t + E_b(t_2) - E_b(t_1) $
+  $ E_e = integral_(t_1)^(t_2) (p_c (t))^+ d t + E_b (t_2) - E_b (t_1) $
 
-  where $E_b(t)$ denotes the battery charge measured at time $t$ and $p_c(t)$ is
-  the known power consumption. This indirect method accumulates errors from both
-  the ADC quantization and the uncertainty in $p_c(t)$; dedicated energy
+  where $E_b (t)$ denotes the battery charge measured at time $t$ and $p_c (t)$
+  is the known power consumption. This indirect method accumulates errors from
+  both the ADC quantization and the uncertainty in $p_c (t)$; dedicated energy
   metering hardware provides more accurate results at the cost of additional
   circuit complexity.
 
   == Energy Neutrality
 
   The conventional objective in IoT energy management is to maximize device
-  lifetime---to keep the device operational for as long as possible given a fixed
-  energy reserve. Energy harvesting enables a qualitatively different objective:
-  _energy neutrality_, the condition in which a device can maintain a desired
-  performance level indefinitely. An energy-neutral device neither depletes its
-  battery over time nor operates below its minimum useful performance level; it
-  operates within the bounds set by the available harvested energy, adapting its
-  performance to match energy availability.
+  lifetime---to keep the device operational for as long as possible given a
+  fixed energy reserve. Energy harvesting enables a qualitatively different
+  objective: _energy neutrality_, the condition in which a device can maintain a
+  desired performance level indefinitely. An energy-neutral device neither
+  depletes its battery over time nor operates below its minimum useful
+  performance level; it operates within the bounds set by the available
+  harvested energy, adapting its performance to match energy availability.
 
   The distinction matters because maximizing lifetime and maximizing performance
   under energy neutrality lead to different system designs. A
   lifetime-maximizing design reduces energy consumption as far as possible,
   which may mean operating below any useful performance threshold. An
   energy-neutral design aims to maximize the performance that can be sustained
-  indefinitely given the harvesting environment---a higher and more useful target.
-  Consider a network of sensors monitoring a patient's location in an
+  indefinitely given the harvesting environment---a higher and more useful
+  target. Consider a network of sensors monitoring a patient's location in an
   assisted-living home: the goal is not to keep the sensors alive as long as
   possible at minimal function, but to provide the highest sustained
   localization accuracy that the available solar or thermal energy can support.
@@ -268,14 +269,14 @@
   characterized by statistical properties of energy production, what conditions
   must the load satisfy to guarantee energy neutrality?
 
-  The framework models energy production $E_T = integral_0^T P_s(t) d t$ over
+  The framework models energy production $E_T = integral_0^T P_s (t) d t$ over
   any interval $[0, T]$ as satisfying a linear bounding constraint: there exist
   real numbers $rho_s$ (the long-run average production rate) and $sigma$ (a
   burstiness parameter) such that:
 
   $ rho_s dot T - sigma <= E_T <= rho_s dot T + sigma quad forall T $
 
-  Similarly, the energy load $L_T = integral_0^T P_c(t) d t$ is modeled as
+  Similarly, the energy load $L_T = integral_0^T P_c (t) d t$ is modeled as
   satisfying:
 
   $ 0 <= L_T <= rho_c dot T + delta $
@@ -289,7 +290,7 @@
   $eta rho_s >= rho_c + rho_"leak"$. Second, the initial battery charge must be
   sufficient to handle the worst-case mismatch between production and
   consumption: $B_0 >= eta sigma + delta$. Third, the required initial charge
-  must be admissible: $B_"max" >= B_0$. These conditions are sufficient but not
+  must be admissible: $B_0 <= B_"max"$. These conditions are sufficient but not
   necessary: a system may achieve energy neutrality with a smaller battery if
   the actual production and load profiles are better matched than the worst-case
   bounds suggest.
@@ -334,9 +335,9 @@
   Energy production estimates are generated by an _exponentially weighted moving
   average_ (EWMA) filter. The estimated production in slot $i$ for day $j+1$ is:
 
-  $ hat(p)_s^(j+1)(i) = alpha dot hat(p)_s^j(i) + (1 - alpha) dot p_s^j(i) $
+  $ hat(p)_s^(j+1) (i) = alpha dot hat(p)_s^j (i) + (1 - alpha) dot p_s^j (i) $
 
-  where $p_s^j(i)$ is the measured production in slot $i$ of day $j$ and
+  where $p_s^j (i)$ is the measured production in slot $i$ of day $j$ and
   $alpha < 1$ is a smoothing parameter. The EWMA filter assumes day-to-day
   production in the same slot is correlated (as is the case for solar energy),
   giving more weight to the most recent observation while retaining historical
@@ -369,11 +370,11 @@
   The battery charge at the end of slot $i$ evolves as:
 
   $
-    B(i+1) = min(B_"max", B(i) + eta dot (p_s(i) - p_c(i))^+ - (p_c(i) - p_s(i))^+)
+    B(i+1) = min(B_"max", B(i) + eta dot (p_s (i) - p_c (i))^+ - (p_c (i) - p_s (i))^+)
   $
 
-  where $p_c(i)$ is the power consumption of the task assigned to slot $i$ and
-  $p_s(i)$ is the estimated harvested power in that slot. The battery charge is
+  where $p_c (i)$ is the power consumption of the task assigned to slot $i$ and
+  $p_s (i)$ is the estimated harvested power in that slot. The battery charge is
   capped at $B_"max"$ (excess production is wasted once the buffer is full) and
   must remain above $B_"min"$ at all times (the minimum operating voltage). The
   energy neutrality constraint requires that the battery charge at the end of
@@ -401,18 +402,18 @@
   The dynamic programming recursion operates backward from the last slot. For
   the last slot $k$, the optimal utility is:
 
-  $ "opt"(k, b) = max { u_j : b + eta dot (p_s^+(k) - p_c^-(k)) >= B(1) } $
+  $ "opt"(k, b) = max { u_j : b + eta dot (p_s^+ (k) - p_c^- (k)) >= B(1) } $
 
   where the maximization is over all tasks $j = 0, dots, n-1$ that leave the
-  battery in a state satisfying energy neutrality, and $p_s^+(k)$ and $p_c^-(k)$
-  denote the surplus production and deficit consumption for that task
-  assignment. For earlier slots:
+  battery in a state satisfying energy neutrality, and $p_s^+ (k)$ and
+  $p_c^- (k)$ denote the surplus production and deficit consumption for that
+  task assignment. For earlier slots:
 
   $
-    "opt"(i, b) = max_(j = 0, dots, n-1) { u_j + "opt"(i+1, B_j(i+1)) : B_j(i+1) >= B_"min" }
+    "opt"(i, b) = max_(j = 0, dots, n-1) { u_j + "opt"(i+1, B_j (i+1)) : B_j (i+1) >= B_"min" }
   $
 
-  where $B_j(i+1)$ is the battery level at the end of slot $i$ if task $T_j$ is
+  where $B_j (i+1)$ is the battery level at the end of slot $i$ if task $T_j$ is
   assigned to that slot and the battery level at the start is $b$.
 
   The memory complexity of the algorithm is $O(|"BatteryLevels"|)$ when
@@ -444,19 +445,20 @@
   algorithm includes a dynamic adaptation mechanism that re-optimizes remaining
   slots when actual production deviates significantly from forecast, but this
   adaptation is reactive rather than anticipatory. More sophisticated
-  forecasting methods---incorporating weather APIs, multiple-day horizon planning,
-  or machine learning models trained on site-specific historical data---can
-  improve forecast accuracy at the cost of greater computational complexity.
+  forecasting methods---incorporating weather APIs, multiple-day horizon
+  planning, or machine learning models trained on site-specific historical
+  data---can improve forecast accuracy at the cost of greater computational
+  complexity.
 
   The task-based model assumes discrete, well-characterized implementation
   alternatives with known and stable energy costs. In practice, energy costs
   depend on environmental conditions (radio propagation distance affects
   transmit power; temperature affects sensor calibration time), and utility is
-  difficult to quantify precisely. The framework's linearity assumptions---between
-  duty cycle and power consumption, and between duty cycle and utility---are
-  approximations that may not hold for all application types. Extensions of the
-  task-based model to richer utility representations, multi-device joint
-  optimization, and non-stationary harvesting environments remain active areas
-  of research.
+  difficult to quantify precisely. The framework's linearity
+  assumptions---between duty cycle and power consumption, and between duty cycle
+  and utility---are approximations that may not hold for all application types.
+  Extensions of the task-based model to richer utility representations,
+  multi-device joint optimization, and non-stationary harvesting environments
+  remain active areas of research.
 
 ]

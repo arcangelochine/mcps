@@ -26,7 +26,7 @@
 
 #tableofcontents
 
-#part("Part 1")
+#part("Constrained Devices and Sensor Networks")
 
 #include "chapters/01_iot.typ"
 #include "chapters/02_iot_design.typ"
@@ -37,7 +37,7 @@
 #include "chapters/07_mqtt.typ"
 #include "chapters/08_arduino.typ"
 
-#part("Part 2")
+#part("Wireless Communication and Network Infrastructure")
 
 #include "chapters/09_wireless.typ"
 #include "chapters/10_mobile.typ"
